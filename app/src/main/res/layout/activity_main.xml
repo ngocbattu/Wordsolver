@@ -4,14 +4,66 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:padding="20dp"
+    android:background="@drawable/backgr"
+    >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#ff01"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="ILOVEANDROID"
+        android:id="@+id/txtChuCanTim"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="100dp"
+        android:gravity="center"
+        android:textSize="25sp"
+
+        />
+    <TextView
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@+id/txtChuCanTim"
+        android:layout_marginTop="30dp"
+        android:hint="Nhập đáp án của bạn"
+        android:gravity="center"
+        android:id="@+id/txtDapAnCuaBan"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtDapAnCuaBan"
+        android:layout_marginTop="210dp"
+        android:id="@+id/rcyBangChuCai"
+
+        />
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Check"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/btnCheckDapAn"
+        android:backgroundTint="#8BC34A"
+        />
+
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginEnd="4dp"
+        android:gravity="center"
+        android:text="60"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:id="@+id/txtThoiGian"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
