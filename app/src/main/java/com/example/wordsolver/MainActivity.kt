@@ -8,15 +8,20 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.billingclient.api.*
 import com.example.wordsolver.Adapter.AlphabetAdapter
 import com.example.wordsolver.Model.Alphabet
 import com.example.wordsolver.Model.SeriesOfQuestions
+import com.example.wordsolver.databinding.ActivityMainBinding
+import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.ImmutableList
 
 class MainActivity : AppCompatActivity(){
+    private val inapp_type_1 = "free_image_animal_15_day"
    lateinit var rcyAlphabet : RecyclerView
    lateinit var txtChuCanTim : TextView
    lateinit var txtChuBanChon : TextView
@@ -27,10 +32,12 @@ class MainActivity : AppCompatActivity(){
    lateinit var  alphabetAdapter : AlphabetAdapter
      var  location : Int = 0
     var count : Int = 0
-
+    var listProductDetails : MutableList<ProductDetails> = mutableListOf()
+    private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         init()
         insertListAlphabet()
         getListAlphabet()
@@ -38,6 +45,61 @@ class MainActivity : AppCompatActivity(){
         setSeri(listSeriesOfQuestions.get(count))
         checkAlphabet()
         time60s()
+        val purchasesUpdatedListener =
+            PurchasesUpdatedListener { billingResult, purchases ->
+
+            }
+
+        var billingClient = BillingClient.newBuilder(this)
+            .setListener(purchasesUpdatedListener)
+            .enablePendingPurchases()
+            .build()
+      binding.imageBuy.setOnClickListener(View.OnClickListener {
+            Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show()
+          try {
+              billingClient.startConnection(object : BillingClientStateListener {
+                  override fun onBillingSetupFinished(billingResult: BillingResult) {
+                      if (billingResult.responseCode ==  BillingClient.BillingResponseCode.OK) {
+                          val queryProductDetailsParams =
+                              QueryProductDetailsParams.newBuilder()
+                                  .setProductList(
+                                      ImmutableList.of(
+                                          QueryProductDetailsParams.Product.newBuilder()
+                                              .setProductId(inapp_type_1)
+                                              .setProductType(BillingClient.ProductType.INAPP)
+                                              .build()))
+                                  .build()
+
+                          billingClient.queryProductDetailsAsync(queryProductDetailsParams) {
+                                  billingResult,
+                                  productDetailsList ->
+                              listProductDetails = productDetailsList
+                              for (i in listProductDetails.indices){
+                                  val productDetailsParamsList = listOf(
+                                      BillingFlowParams.ProductDetailsParams.newBuilder()
+                                          .setProductDetails(listProductDetails.get(i))
+                                          .build()
+                                  )
+
+                                  val billingFlowParams = BillingFlowParams.newBuilder()
+                                      .setProductDetailsParamsList(productDetailsParamsList)
+                                      .build()
+                                  val billingResult = billingClient.launchBillingFlow(this@MainActivity, billingFlowParams)
+                              }
+
+                          }
+
+                      }
+                  }
+                  override fun onBillingServiceDisconnected() {
+
+                  }
+              })
+          }catch (e:Exception){
+              e.printStackTrace()
+          }
+
+        })
 
     }
 
@@ -56,6 +118,7 @@ class MainActivity : AppCompatActivity(){
         txtChuBanChon = findViewById(R.id.txtDapAnCuaBan)
         btnCheckDapAn = findViewById(R.id.btnCheckDapAn)
         txtThoiGian = findViewById(R.id.txtThoiGian)
+
     }
     fun getListAlphabet(){
         rcyAlphabet.layoutManager = GridLayoutManager(this@MainActivity,5)
@@ -136,7 +199,6 @@ class MainActivity : AppCompatActivity(){
         object : CountDownTimer(60000,1000){
             override fun onTick(p0: Long) {
                 txtThoiGian.setText((p0/1000).toString())
-
             }
             override fun onFinish() {
                 val dialog : Dialog = Dialog(this@MainActivity)
@@ -150,9 +212,7 @@ class MainActivity : AppCompatActivity(){
                     setSeri(listSeriesOfQuestions.get(0))
                 })
                 dialog.show()
-
             }
-
         }.start()
     }
 }
