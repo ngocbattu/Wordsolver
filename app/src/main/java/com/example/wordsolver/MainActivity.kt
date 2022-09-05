@@ -1,6 +1,7 @@
 package com.example.wordsolver
 
 import android.app.Dialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -32,7 +33,6 @@ class MainActivity : AppCompatActivity(){
    lateinit var  alphabetAdapter : AlphabetAdapter
      var  location : Int = 0
     var count : Int = 0
-    var listProductDetails : MutableList<ProductDetails> = mutableListOf()
     private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,48 +56,49 @@ class MainActivity : AppCompatActivity(){
             .build()
       binding.imageBuy.setOnClickListener(View.OnClickListener {
             Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show()
-          try {
-              billingClient.startConnection(object : BillingClientStateListener {
-                  override fun onBillingSetupFinished(billingResult: BillingResult) {
-                      if (billingResult.responseCode ==  BillingClient.BillingResponseCode.OK) {
-                          val queryProductDetailsParams =
-                              QueryProductDetailsParams.newBuilder()
-                                  .setProductList(
-                                      ImmutableList.of(
-                                          QueryProductDetailsParams.Product.newBuilder()
-                                              .setProductId(inapp_type_1)
-                                              .setProductType(BillingClient.ProductType.INAPP)
-                                              .build()))
-                                  .build()
-
-                          billingClient.queryProductDetailsAsync(queryProductDetailsParams) {
-                                  billingResult,
-                                  productDetailsList ->
-                              listProductDetails = productDetailsList
-                              for (i in listProductDetails.indices){
-                                  val productDetailsParamsList = listOf(
-                                      BillingFlowParams.ProductDetailsParams.newBuilder()
-                                          .setProductDetails(listProductDetails.get(i))
-                                          .build()
-                                  )
-
-                                  val billingFlowParams = BillingFlowParams.newBuilder()
-                                      .setProductDetailsParamsList(productDetailsParamsList)
-                                      .build()
-                                  val billingResult = billingClient.launchBillingFlow(this@MainActivity, billingFlowParams)
-                              }
-
-                          }
-
-                      }
-                  }
-                  override fun onBillingServiceDisconnected() {
-
-                  }
-              })
-          }catch (e:Exception){
-              e.printStackTrace()
-          }
+          startActivity(Intent(this@MainActivity,PaymentPackagesActivity::class.java))
+//          try {
+//              billingClient.startConnection(object : BillingClientStateListener {
+//                  override fun onBillingSetupFinished(billingResult: BillingResult) {
+//                      if (billingResult.responseCode ==  BillingClient.BillingResponseCode.OK) {
+//                          val queryProductDetailsParams =
+//                              QueryProductDetailsParams.newBuilder()
+//                                  .setProductList(
+//                                      ImmutableList.of(
+//                                          QueryProductDetailsParams.Product.newBuilder()
+//                                              .setProductId(inapp_type_1)
+//                                              .setProductType(BillingClient.ProductType.INAPP)
+//                                              .build()))
+//                                  .build()
+//
+//                          billingClient.queryProductDetailsAsync(queryProductDetailsParams) {
+//                                  billingResult,
+//                                  productDetailsList ->
+//                              listProductDetails = productDetailsList
+//                              for (i in listProductDetails.indices){
+//                                  val productDetailsParamsList = listOf(
+//                                      BillingFlowParams.ProductDetailsParams.newBuilder()
+//                                          .setProductDetails(listProductDetails.get(i))
+//                                          .build()
+//                                  )
+//
+//                                  val billingFlowParams = BillingFlowParams.newBuilder()
+//                                      .setProductDetailsParamsList(productDetailsParamsList)
+//                                      .build()
+//                                  val billingResult = billingClient.launchBillingFlow(this@MainActivity, billingFlowParams)
+//                              }
+//
+//                          }
+//
+//                      }
+//                  }
+//                  override fun onBillingServiceDisconnected() {
+//
+//                  }
+//              })
+//          }catch (e:Exception){
+//              e.printStackTrace()
+//          }
 
         })
 
@@ -177,7 +178,20 @@ class MainActivity : AppCompatActivity(){
 
     fun nextSeri(){
         if(count == listAlphabet.size - 1 ){
+            val dialog : Dialog = Dialog(this@MainActivity)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setContentView(R.layout.dia_log_game_over)
+
+            val btnChoiLai : Button = dialog.findViewById(R.id.btnChoiLai)
+            btnChoiLai.setText("You Win")
+            btnChoiLai.setOnClickListener(View.OnClickListener {
+                dialog.dismiss()
+                time60s()
+                setSeri(listSeriesOfQuestions.get(0))
+            })
+            dialog.show()
             Toast.makeText (this, "Chúc mừng bạn đã win game", Toast.LENGTH_SHORT).show ()
+            return
         }else {
             count++;
             setSeri(listSeriesOfQuestions.get(count))
