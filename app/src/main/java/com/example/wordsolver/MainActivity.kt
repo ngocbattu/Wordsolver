@@ -177,25 +177,20 @@ class MainActivity : AppCompatActivity(){
     }
 
     fun nextSeri(){
-        if(count == listAlphabet.size - 1 ){
-            val dialog : Dialog = Dialog(this@MainActivity)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setContentView(R.layout.dia_log_game_over)
-
-            val btnChoiLai : Button = dialog.findViewById(R.id.btnChoiLai)
-            btnChoiLai.setText("You Win")
-            btnChoiLai.setOnClickListener(View.OnClickListener {
-                dialog.dismiss()
-                time60s()
-                setSeri(listSeriesOfQuestions.get(0))
-            })
-            dialog.show()
-            Toast.makeText (this, "Chúc mừng bạn đã win game", Toast.LENGTH_SHORT).show ()
-            return
-        }else {
-            count++;
-            setSeri(listSeriesOfQuestions.get(count))
+        try {
+            if(count == listAlphabet.size - 1 ){
+                Toast.makeText (this, "Chúc mừng bạn đã win game", Toast.LENGTH_SHORT).show ()
+                count = 0
+                setSeri(listSeriesOfQuestions.get(count))
+                return
+            }else {
+                count++
+                setSeri(listSeriesOfQuestions.get(count))
+            }
+        }catch (e : Exception){
+            e.printStackTrace()
         }
+
     }
     fun checkAlphabet(){
         btnCheckDapAn.setOnClickListener(View.OnClickListener {
